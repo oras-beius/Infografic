@@ -8,7 +8,7 @@ const RAW_SHEET_URL =
 const CORS_PROXY = "https://api.allorigins.win/get?url=";
 const SHEET_URL = CORS_PROXY + encodeURIComponent(RAW_SHEET_URL);
 
-const TODAY_AS_OF = new Date("2025-10-10T12:00:00Z");
+const TODAY_AS_OF = new Date();
 
 const exportToCSV = () => {
   if (projectData.length === 0) {
