@@ -1,7 +1,6 @@
 let currentChartInstances = {};
 let nextId = 5;
 let projectData = [];
-const LOCAL_STORAGE_KEY = "project_infographic_local_data";
 
 const RAW_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGii2rWgPxTiOdSN-WunnE2LVE0TVzvRP6Q_5xK0ikcw1fXn5vvJ1cKLvyd-COpQ7ZJFnmQNWwEfuQ/pub?output=csv";
@@ -9,58 +8,7 @@ const RAW_SHEET_URL =
 const CORS_PROXY = "https://api.allorigins.win/get?url=";
 const SHEET_URL = CORS_PROXY + encodeURIComponent(RAW_SHEET_URL);
 
-const DEFAULT_PROJECT_DATA = [
-  {
-    id: 1,
-    name: "Reabilitare Strada Principală A",
-    start: "2025-09-20",
-    end: "2025-11-05",
-    status: "Active",
-    source: "sheet",
-  },
-  {
-    id: 2,
-    name: "Finalizare Amenajare Parcul Central",
-    start: "2025-09-15",
-    end: "2025-10-01",
-    status: "Completed",
-    source: "sheet",
-  },
-  {
-    id: 3,
-    name: "Instalare Sistem Supraveghere Cartier Nou",
-    start: "2025-10-01",
-    end: null,
-    status: "On Hold",
-    source: "sheet",
-  },
-  {
-    id: 4,
-    name: "Planificare Bugetară Anul Viitor",
-    start: "2025-09-25",
-    end: null,
-    status: "Active",
-    source: "sheet",
-  },
-];
-
 const TODAY_AS_OF = new Date("2025-10-10T12:00:00Z");
-
-const saveLocalData = () => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(projectData));
-};
-
-const loadLocalData = () => {
-  try {
-    const localDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (localDataString) {
-      return JSON.parse(localDataString);
-    }
-  } catch (e) {
-    console.error("Failed to load local storage data:", e);
-  }
-  return null;
-};
 
 const exportToCSV = () => {
   if (projectData.length === 0) {
@@ -97,8 +45,6 @@ const exportToCSV = () => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-
-  console.log("CSV Exported successfully.");
 };
 
 const fetchSheetData = async () => {
@@ -118,24 +64,12 @@ const fetchSheetData = async () => {
       const json = JSON.parse(rawResponse);
       if (json.contents) {
         csvText = json.contents;
-        console.log(
-          "Date preluate cu succes prin proxy (wrapper JSON detectat)."
-        );
       } else {
-        console.warn(
-          "Proxy a returnat JSON, dar fără câmpul 'contents'. Se încearcă procesarea ca text brut."
-        );
         csvText = rawResponse;
       }
     } catch (e) {
-      console.log("Date preluate și tratate ca text CSV brut.");
       csvText = rawResponse;
     }
-
-    console.log(
-      "Raw CSV Text Preview (First 500 chars):",
-      csvText.substring(0, 500)
-    );
 
     const base64Data = csvText.split(",")[1];
     const decoded = decodeURIComponent(escape(atob(base64Data)));
@@ -143,8 +77,6 @@ const fetchSheetData = async () => {
     const lines = decoded
       .split(/\r?\n|\r/)
       .filter((line) => line.trim() !== "");
-
-    console.log(lines);
 
     if (lines.length >= 1) {
       const headers = lines[0]
@@ -160,8 +92,6 @@ const fetchSheetData = async () => {
         end: headers.indexOf("end"),
         status: headers.indexOf("status"),
       };
-
-      console.log(headers);
 
       const requiredIndices = [
         headerIndices["id"],
@@ -214,35 +144,14 @@ const fetchSheetData = async () => {
           }
         }
       }
-      console.table(sheetData);
     }
   } catch (error) {
-    console.error(
-      `Eroare la preluarea sau parsarea datelor (verificați URL-ul proxy/HTTP).\n- 1. URL-ul Google Sheet (${RAW_SHEET_URL}) nu este corect sau nu este publicat ca CSV.\n- 2. Serviciul proxy (${CORS_PROXY}) a eșuat sau a returnat date nevalide.`,
-      error
-    );
     sheetData = [];
     maxIdFromSheet = 0;
   }
 
-  const localData = loadLocalData();
-
-  if (localData && localData.length > 0) {
-    projectData = localData;
-    console.log(`Încărcat ${localData.length} proiecte din stocarea locală.`);
-  }
   if (sheetData.length > 0) {
     projectData = sheetData;
-    console.log(
-      `Se începe cu ${projectData.length} proiecte încărcate din foaia Google.`
-    );
-    saveLocalData();
-  } else {
-    projectData = DEFAULT_PROJECT_DATA;
-    console.log(
-      `Datele din foaia Google și stocarea locală sunt goale. Se folosesc datele implicite (${projectData.length} proiecte).`
-    );
-    saveLocalData();
   }
 
   nextId =
@@ -270,9 +179,8 @@ const updateDynamicDates = () => {
   const currentQuarter = Math.ceil((date.getMonth() + 1) / 3);
   const formattedDate = formatDate(date);
 
-  document.getElementById(
-    "mainTitle"
-  ).textContent = `Portofoliu de Proiecte Municipale Beiuş: ${currentYear}`;
+  document.getElementById("mainTitle").textContent =
+    document.getElementById("mainTitle").textContent + " " + currentYear;
   document.getElementById(
     "subtitle"
   ).textContent = `O prezentare infografică a cronologiilor, duratelor și statusurilor curente ale proiectelor, date actualizate la ${formattedDate}.`;
@@ -408,75 +316,6 @@ const sharedChartOptions = {
   },
 };
 
-const listProjects = () => {
-  const listContainer = document.getElementById("projectList");
-  listContainer.innerHTML = "";
-
-  if (projectData.length === 0) {
-    listContainer.innerHTML =
-      '<p class="text-center text-slate-500 py-4">Nu sunt urmărite proiecte în prezent.</p>';
-    return;
-  }
-
-  projectData.forEach((p) => {
-    const item = document.createElement("div");
-    const sourceBadge =
-      p.source === "sheet"
-        ? '<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded text-indigo-600 bg-indigo-200 uppercase last:mr-0 mr-1">Sheet</span>'
-        : '<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded text-yellow-600 bg-yellow-200 uppercase last:mr-0 mr-1">Local</span>';
-
-    item.className =
-      "flex justify-between items-center bg-slate-50 p-3 rounded-md border border-slate-200";
-    item.innerHTML = `
-                    <span class="truncate text-slate-800 font-medium">${p.name}</span>
-                    <div class="flex items-center space-x-2">
-                        ${sourceBadge}
-                        <button onclick="removeProject(${p.id})" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition duration-150">
-                            &#x1F5D1;
-                        </button>
-                    </div>
-                `;
-    listContainer.appendChild(item);
-  });
-};
-
-const addProject = () => {
-  const name = document.getElementById("projectName").value.trim();
-  const start = document.getElementById("startDate").value;
-  const end = document.getElementById("endDate").value || null;
-  const status = document.getElementById("projectStatus").value;
-
-  if (!name || !start) {
-    console.error("Numele Proiectului și Data de Început sunt obligatorii.");
-    return;
-  }
-
-  const newProject = {
-    id: nextId++,
-    name,
-    start,
-    end,
-    status,
-    source: "local", // Marcat ca adăugat local
-  };
-
-  projectData.push(newProject);
-
-  document.getElementById("projectName").value = "";
-  document.getElementById("startDate").value = "";
-  document.getElementById("endDate").value = "";
-  document.getElementById("projectStatus").value = "Active";
-
-  saveLocalData();
-  renderCharts();
-};
-
-const removeProject = (id) => {
-  projectData = projectData.filter((p) => p.id !== id);
-  saveLocalData();
-  renderCharts();
-};
-
 const renderCharts = () => {
   Object.values(currentChartInstances).forEach((chart) => {
     if (chart && typeof chart.destroy === "function") {
@@ -488,7 +327,6 @@ const renderCharts = () => {
   document.getElementById("totalProjects").textContent = projectData.length;
 
   if (projectData.length === 0) {
-    listProjects();
     return;
   }
 
@@ -530,7 +368,7 @@ const renderCharts = () => {
         labels: Object.keys(statusCounts),
         datasets: [
           {
-            label: "Status Proiect",
+            label: "Activ",
             data: Object.values(statusCounts),
             backgroundColor: ["#54A0FF", "#00D2D3", "#2E4057"],
             borderColor: "#FFFFFF",
@@ -538,7 +376,15 @@ const renderCharts = () => {
           },
         ],
       },
-      options: { ...sharedChartOptions, scales: {} },
+      options: {
+        ...sharedChartOptions,
+        scales: {},
+        plugins: {
+          legend: {
+            position: "top",
+          },
+        },
+      },
     }
   );
 
@@ -650,8 +496,6 @@ const renderCharts = () => {
       },
     }
   );
-
-  listProjects();
 };
 
 window.onload = async () => {
@@ -659,6 +503,3 @@ window.onload = async () => {
   updateDynamicDates();
   renderCharts();
 };
-window.addProject = addProject;
-window.removeProject = removeProject;
-window.exportToCSV = exportToCSV;

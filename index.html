@@ -21,14 +21,12 @@
   <body class="bg-slate-50 text-slate-800">
     <header class="bg-white shadow-md">
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Dynamic Title -->
         <h1
           id="mainTitle"
           class="text-5xl font-bold leading-tight text-blue-900"
         >
-          Status Portofoliu de Proiecte Municipale
+          Portofoliu de Proiecte Municipale Beiuş:
         </h1>
-        <!-- Dynamic Subtitle -->
         <p id="subtitle" class="mt-2 text-slate-600">
           O prezentare infografică a cronologiilor, duratelor și statusurilor
           curente ale proiectelor.
@@ -54,7 +52,7 @@
                 Total Proiecte
               </h3>
               <p id="totalProjects" class="text-6xl font-bold text-[#007BFF]">
-                4
+                -
               </p>
               <p class="text-slate-500 mt-2">
                 Urmărite în prezent în portofoliu.
@@ -100,7 +98,7 @@
           </div>
         </section>
 
-        <section class="mb-12">
+        <section>
           <div class="text-center mb-8">
             <h2 class="text-2xl font-bold text-slate-900">
               Vizualizarea Cronologiei Proiectelor
@@ -123,137 +121,14 @@
             </div>
           </div>
         </section>
-
-        <!-- Project Management Console -->
-        <section class="mb-12">
-          <div class="text-center mb-8">
-            <h2 class="text-2xl font-bold text-slate-900">
-              Consolă de Management al Proiectelor
-            </h2>
-            <p
-              class="text-slate-700 mt-2 font-semibold p-2 bg-yellow-100 rounded-md"
-            >
-              ⚠️ Notă: Modificările sunt salvate
-              <em class="text-red-500">local</em>. Folosiți
-              <em class="text-red-500">"Exportă CSV"</em> pentru a le sincroniza
-              manual cu Foaia Google. <br />
-            </p>
-            <p class="text-slate-700 mt-2 p-2 bg-yellow-100 rounded-md">
-              <a
-                class="text-blue-600 hover:underline"
-                href="https://docs.google.com/spreadsheets/d/1DN_9s5XUbWPhefmgDAe-4fVtOanX3KYgzIu1MHZ5ld4/edit?gid=0#gid=0"
-              >
-                Link foaie google</a
-              >
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Add Project Form -->
-            <div
-              class="lg:col-span-1 bg-white rounded-lg shadow-md p-6 border-t-4 border-[#007BFF]"
-            >
-              <h3 class="text-xl font-semibold text-[#007BFF] mb-4">
-                Adaugă Proiect Nou
-              </h3>
-              <div class="space-y-4">
-                <div>
-                  <label
-                    for="projectName"
-                    class="block text-sm font-medium text-slate-700"
-                    >Numele Proiectului</label
-                  >
-                  <input
-                    type="text"
-                    id="projectName"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border-2"
-                    placeholder="ex., Modernizare Iluminat Străzi"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    for="startDate"
-                    class="block text-sm font-medium text-slate-700"
-                    >Data Început</label
-                  >
-                  <input
-                    type="date"
-                    id="startDate"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    for="endDate"
-                    class="block text-sm font-medium text-slate-700"
-                    >Data Finalizare (Opțional)</label
-                  >
-                  <input
-                    type="date"
-                    id="endDate"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border-2"
-                  />
-                </div>
-                <div>
-                  <label
-                    for="projectStatus"
-                    class="block text-sm font-medium text-slate-700"
-                    >Status</label
-                  >
-                  <select
-                    id="projectStatus"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border-2"
-                  >
-                    <option value="Active">Activ</option>
-                    <option value="Completed">Finalizat</option>
-                    <option value="On Hold">În Așteptare</option>
-                  </select>
-                </div>
-                <button
-                  onclick="addProject()"
-                  class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#007BFF] hover:bg-[#54A0FF] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#007BFF]"
-                >
-                  Adaugă Proiect
-                </button>
-              </div>
-            </div>
-
-            <!-- Remove Project List -->
-            <div
-              class="lg:col-span-2 bg-white rounded-lg shadow-md p-6 border-t-4 border-[#2E4057]"
-            >
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-[#2E4057]">
-                  Elimină Proiect Existent
-                </h3>
-                <button
-                  onclick="exportToCSV()"
-                  class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#10B981] hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#10B981] transition duration-150"
-                >
-                  Exportă CSV
-                </button>
-              </div>
-              <p class="text-sm text-slate-600 mb-4">
-                Faceți clic pe pictograma coș de gunoi pentru a elimina un
-                proiect din portofoliu.
-              </p>
-              <div id="projectList" class="space-y-2 max-h-96 overflow-y-auto">
-                <!-- Project items will be dynamically inserted here -->
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
 
-    <footer class="bg-white mt-12">
+    <footer class="bg-white">
       <div
         class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-slate-500"
       >
         <p>
-          &copy; 2024 Biroul de Management al Proiectelor.
           <span id="footerDate"></span>
         </p>
       </div>
