@@ -3,19 +3,12 @@ let nextId = 5;
 let projectData = [];
 const LOCAL_STORAGE_KEY = "project_infographic_local_data";
 
-// =========================================================================
-// CONFIGURARE SURSĂ DATE GOOGLE SHEETS (CU PROXY)
-// =========================================================================
-
-// VĂ RUGĂM SĂ VĂ ASIGURAȚI CĂ ACEST URL ESTE CORECT ȘI PUBLICAT CA CSV
 const RAW_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGii2rWgPxTiOdSN-WunnE2LVE0TVzvRP6Q_5xK0ikcw1fXn5vvJ1cKLvyd-COpQ7ZJFnmQNWwEfuQ/pub?output=csv";
 
-// Am reintrodus proxy-ul și l-am aplicat pe URL-ul brut
-const CORS_PROXY = "https://api.allorigins.win/get?url="; // ACTUALIZAT LA allorigins.win
+const CORS_PROXY = "https://api.allorigins.win/get?url=";
 const SHEET_URL = CORS_PROXY + encodeURIComponent(RAW_SHEET_URL);
 
-// Datele implicite (fallback)
 const DEFAULT_PROJECT_DATA = [
   {
     id: 1,
@@ -53,10 +46,6 @@ const DEFAULT_PROJECT_DATA = [
 
 const TODAY_AS_OF = new Date("2025-10-10T12:00:00Z");
 
-// =========================================================================
-// LOGICĂ DE PERSISTENȚĂ LOCALĂ ȘI EXPORT CSV
-// =========================================================================
-
 const saveLocalData = () => {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(projectData));
 };
@@ -79,25 +68,21 @@ const exportToCSV = () => {
     return;
   }
 
-  // Coloanele trebuie să se potrivească cu cele din foaia Google: id, name, start, end, status
   const headers = ["id", "name", "start", "end", "status"];
 
-  // Crearea rândurilor de date
   const rows = projectData.map((p) => [
     p.id,
     `"${p.name.replace(/"/g, '""')}"`,
     p.start,
-    p.end || "", // Folosește șir gol dacă data de final este null
+    p.end || "",
     p.status,
   ]);
 
-  // Unirea rândurilor și coloanelor cu virgulă (,) și linie nouă (\n)
   const csvContent = [
     headers.join(","),
     ...rows.map((row) => row.join(",")),
   ].join("\n");
 
-  // Crearea unui Blob și declanșarea descărcării
   const blob = new Blob([csvContent], {
     type: "text/csv;charset=utf-8;",
   });
@@ -106,7 +91,6 @@ const exportToCSV = () => {
   const url = URL.createObjectURL(blob);
   link.setAttribute("href", url);
 
-  // Denumirea fișierului: Project_Export_20251010.csv
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
   link.setAttribute("download", `Project_Export_${date}.csv`);
 
@@ -116,10 +100,6 @@ const exportToCSV = () => {
 
   console.log("CSV Exported successfully.");
 };
-
-// =========================================================================
-// LOGICĂ DE PRELUARE DATE (GESTIONARE JSON ȘI CSV)
-// =========================================================================
 
 const fetchSheetData = async () => {
   let sheetData = [];
@@ -183,7 +163,6 @@ const fetchSheetData = async () => {
 
       console.log(headers);
 
-      // Asigură că toate câmpurile cheie sunt prezente în antet (index >= 0)
       const requiredIndices = [
         headerIndices["id"],
         headerIndices["name"],
@@ -199,17 +178,12 @@ const fetchSheetData = async () => {
       }
 
       for (let i = 1; i < lines.length; i++) {
-        // FIX MAJOR: Folosim split simplu (,) pentru a ne asigura că celulele goale (ex: ,,) sunt păstrate
-        // ca elemente goale în array, prevenind astfel săriturile de rânduri.
         const fields = lines[i].split(",");
 
-        // Verificarea lungimii rândului - asigură că avem cel puțin câmpul "status"
         if (fields.length >= headerIndices["status"] + 1) {
-          // Funcție helper pentru a curăța și prelua valoarea, gestionând undefined/null
           const getCleanValue = (index) => {
             if (fields[index] === undefined || fields[index] === null)
               return "";
-            // Curățarea ghilimelelor, trim și înlocuirea ghilimelelor duble interne
             return fields[index]
               .trim()
               .replace(/^"|"$/g, "")
@@ -219,11 +193,9 @@ const fetchSheetData = async () => {
           const projectId = parseInt(getCleanValue(headerIndices["id"]));
           const projectName = getCleanValue(headerIndices["name"]);
           const startDate = getCleanValue(headerIndices["start"]);
-          // Preia valoarea brută pentru data de final
           const endDateRaw = getCleanValue(headerIndices["end"]);
           const projectStatus = getCleanValue(headerIndices["status"]);
 
-          // Tratarea explicită a șirului gol, 'NULL' sau 'null' ca null
           const endDate =
             endDateRaw === "" || endDateRaw.toUpperCase() === "NULL"
               ? null
@@ -234,7 +206,7 @@ const fetchSheetData = async () => {
               id: projectId,
               name: projectName,
               start: startDate,
-              end: endDate, // Acum poate fi null
+              end: endDate,
               status: projectStatus,
               source: "sheet",
             });
@@ -276,10 +248,6 @@ const fetchSheetData = async () => {
   nextId =
     projectData.length > 0 ? Math.max(...projectData.map((p) => p.id)) + 1 : 1;
 };
-
-// =========================================================================
-// LOGICĂ DE AFISARE ȘI CALCUL (RĂMASĂ NESCHIMBATĂ)
-// =========================================================================
 
 const dateDiffInDays = (a, b) => {
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -494,19 +462,18 @@ const addProject = () => {
 
   projectData.push(newProject);
 
-  // Golește formularul
   document.getElementById("projectName").value = "";
   document.getElementById("startDate").value = "";
   document.getElementById("endDate").value = "";
   document.getElementById("projectStatus").value = "Active";
 
-  saveLocalData(); // Salvează modificarea local
+  saveLocalData();
   renderCharts();
 };
 
 const removeProject = (id) => {
   projectData = projectData.filter((p) => p.id !== id);
-  saveLocalData(); // Salvează modificarea local
+  saveLocalData();
   renderCharts();
 };
 
@@ -533,7 +500,6 @@ const renderCharts = () => {
 
   const processedData = projectData.map((p) => {
     const startDate = new Date(p.start + "T12:00:00Z");
-    // Dacă data de final este null, folosește data de azi (TODAY_AS_OF) pentru calculul duratei.
     const endDate = p.end ? new Date(p.end + "T12:00:00Z") : TODAY_AS_OF;
     const duration = dateDiffInDays(startDate, endDate) + 1;
     return {
@@ -551,7 +517,6 @@ const renderCharts = () => {
     0
   );
 
-  // 1. Grafic Inel Status
   const statusCounts = processedData.reduce((acc, p) => {
     acc[p.statusRo] = (acc[p.statusRo] || 0) + 1;
     return acc;
@@ -577,7 +542,6 @@ const renderCharts = () => {
     }
   );
 
-  // 2. Grafic Bară Durată
   const sortedByDuration = [...processedData].sort(
     (a, b) => a.duration - b.duration
   );
@@ -627,7 +591,6 @@ const renderCharts = () => {
     }
   );
 
-  // 3. Grafic Gantt
   const earliestStartDate = new Date(
     Math.min(...processedData.map((p) => p.startDate))
   );
