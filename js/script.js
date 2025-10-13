@@ -158,13 +158,6 @@ const fetchSheetData = async () => {
     projectData.length > 0 ? Math.max(...projectData.map((p) => p.id)) + 1 : 1;
 };
 
-const dateDiffInDays = (a, b) => {
-  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
-};
-
 const formatDate = (date) => {
   return date.toLocaleDateString("ro-RO", {
     year: "numeric",
@@ -176,7 +169,6 @@ const formatDate = (date) => {
 const updateDynamicDates = () => {
   const date = TODAY_AS_OF;
   const currentYear = date.getFullYear();
-  const currentQuarter = Math.ceil((date.getMonth() + 1) / 3);
   const formattedDate = formatDate(date);
 
   document.getElementById("mainTitle").textContent =
@@ -337,9 +329,9 @@ const renderCharts = () => {
   };
 
   const processedData = projectData.map((p) => {
-    const startDate = new Date(p.start + "T12:00:00Z");
-    const endDate = p.end ? new Date(p.end + "T12:00:00Z") : TODAY_AS_OF;
-    const duration = dateDiffInDays(startDate, endDate) + 1;
+    const startDate = dayjs(p.start, "DD/MM/YYYY");
+    const endDate = p.end ? dayjs(p.end, "DD/MM/YYYY") : dayjs();
+    const duration = Math.abs(startDate.diff(endDate, "d"));
     return {
       ...p,
       startDate,
@@ -437,11 +429,11 @@ const renderCharts = () => {
     }
   );
 
-  const earliestStartDate = new Date(
+  const earliestStartDate = dayjs(
     Math.min(...processedData.map((p) => p.startDate))
   );
   const ganttData = processedData.map((p) => {
-    const offset = dateDiffInDays(earliestStartDate, p.startDate);
+    const offset = Math.abs(earliestStartDate.diff(p.startDate, "day"));
     return { ...p, offset };
   });
 
