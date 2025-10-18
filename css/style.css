@@ -1,22 +1,18 @@
-      body {
-        font-family: "Inter", sans-serif;
-      }
-      .chart-container {
-        position: relative;
-        width: 100%;
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-        height: 24rem;
-        max-height: 450px;
-      }
-      @media (min-width: 768px) {
-        .chart-container {
-          height: 28rem;
-        }
-      }
-      input[type="date"]::-webkit-calendar-picker-indicator {
-        cursor: pointer;
-        filter: invert(30%) sepia(8%) saturate(10%) hue-rotate(185deg)
-          brightness(98%) contrast(90%);
-      }
+body {
+  font-family: "Inter", sans-serif;
+}
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 38rem;
+  max-height: 850px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(30%) sepia(8%) saturate(10%) hue-rotate(185deg) brightness(98%)
+    contrast(90%);
+}

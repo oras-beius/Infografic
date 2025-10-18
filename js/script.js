@@ -72,6 +72,7 @@ const fetchSheetData = async () => {
     }
 
     const base64Data = csvText.split(",")[1];
+
     const decoded = decodeURIComponent(escape(atob(base64Data)));
 
     const lines = decoded
@@ -298,11 +299,11 @@ const sharedChartOptions = {
   },
   scales: {
     x: {
-      ticks: { font: { family: "Inter" } },
+      ticks: { autoSkip: false, font: { family: "Inter" } },
       grid: { display: false },
     },
     y: {
-      ticks: { font: { family: "Inter" } },
+      ticks: { autoSkip: false, font: { family: "Inter" } },
       grid: { color: "#e2e8f0" },
     },
   },
@@ -408,11 +409,11 @@ const renderCharts = () => {
           x: {
             title: { display: true, text: "Total Zile" },
             grid: { display: true, color: "#e2e8f0" },
-            ticks: { font: { family: "Inter" } },
+            ticks: { autoSkip: false, font: { family: "Inter" } },
           },
           y: {
             grid: { display: false },
-            ticks: { font: { family: "Inter" } },
+            ticks: { autoSkip: false, font: { family: "Inter" } },
           },
         },
         plugins: {
@@ -471,18 +472,21 @@ const renderCharts = () => {
               text: "Zile de la Începerea Primului Proiect",
             },
             grid: { display: true, color: "#e2e8f0" },
-            ticks: { font: { family: "Inter" } },
+            ticks: { autoSkip: false, font: { family: "Inter" } },
           },
           y: {
             stacked: true,
             grid: { display: false },
-            ticks: { font: { family: "Inter" } },
+            ticks: { autoSkip: false, font: { family: "Inter" } },
           },
         },
         plugins: {
           ...sharedChartOptions.plugins,
           legend: {
-            display: false,
+            display: true,
+            label: {
+              display: true,
+            },
           },
         },
       },
